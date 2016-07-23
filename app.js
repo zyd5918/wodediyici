@@ -22,16 +22,16 @@ var fs = require('fs');
 var db = require('./db')
 
 
-function getPages(page,pageCount) {
-  var pages = [page]
-  var left = page - 1
-  var right = page+1
+function getPages(page, pageCount) {
+    var pages = [page]
+    var left = page - 1
+    var right = page + 1
 
-  while(pages.length<11&&(left>=1||right<=pageCount)){
-    if(left>0)pages.unshift(left--)
-    if(right<=pageCount)pages.push(right++)
-  }
-  return pages
+    while (pages.length < 11 && (left >= 1 || right <= pageCount)) {
+        if (left > 0) pages.unshift(left--)
+        if (right <= pageCount) pages.push(right++)
+    }
+    return pages
 }
 // app.get('/',(req,res)=>{
 
@@ -97,12 +97,12 @@ app.post('/form/:id', function (req, res, next) {
         if (err) {
             console.log(err)
         }
-        res.redirect('/formList/1')
+        res.redirect('/')
     })
 
 })
 app.get('/list', (req, res) => {
-    res.render('studens/list');
+    res.render('list');
 })
 // app.get('/', (req, res) => {
 app.get('/listData/:page', function (req, res, next) {
@@ -134,36 +134,36 @@ app.get('/listData/:page', function (req, res, next) {
         if (err) {
             console.log(err)
         }
-var pageCount = Math.ceil(total/pageSize)
+        var pageCount = Math.ceil(total / pageSize)
 
-if (page>pageCount) {
-    page = pageCount
-}
-if (page<1) {
-    page = 1
-}
+        if (page > pageCount) {
+            page = pageCount
+        }
+        if (page < 1) {
+            page = 1
+        }
 
-/*****
- * skip跳过当前页码-1的页数的数据
- * limit取当前需要的一页显示数量
- */
+        /*****
+         * skip跳过当前页码-1的页数的数据
+         * limit取当前需要的一页显示数量
+         */
 
-db.Blog.find(filter).skip((page - 1)*pageSize)
-.limit(pageSize).sort({'_id':-1}).exec((err,data)=>{
-
-
-     var data=data.map(function (item) {
-
-item = item.toObject()
-item.id=item._id.toString()
-delete item._id
+        db.Blog.find(filter).skip((page - 1) * pageSize)
+            .limit(pageSize).sort({ 'age': -1 }).exec((err, data) => {
 
 
-            item.birthdayforshow = moment(item.birthday).format('YYYY-MM-DD')
-            return item
-        })
+                var data = data.map(function (item) {
 
-        res.json({data:data,pages:getPages(page,pageCount),page:page,pageCount:pageCount})
+                    item = item.toObject()
+                    item.id = item._id.toString()
+                    delete item._id
+
+
+                    item.birthdayforshow = moment(item.birthday).format('YYYY-MM-DD')
+                    return item
+                })
+
+                res.json({ data: data, pages: getPages(page, pageCount), page: page, pageCount: pageCount })
             })
     })
 })
@@ -179,13 +179,14 @@ app.post('/delete', function (req, res) {
         db.Blog.findByIdAndRemove(req.body.id, (err) => {
             if (err) {
                 console.log(err)
+                res.json({ status: "n", msg: "参数错误" })
             }
-            res.redirect('/formlist/1')
+            res.json({ status: "y", msg: "删除成功" })
         })
 
     }
     else {
-        res.redirect('/formlist/1')
+        res.json({ status: "n", msg: "参数错误" })
     }
 
 })
@@ -244,10 +245,10 @@ function initApp(req, res, next) {
 }
 
 app.use('/comms', require("./comms/comms"))
-
-app.get('/',initApp,(req,res)=>{
-  // res.send('app启动');
-  res.redirect('studens/list');
+// app.use('/student',require('./routes/studens'));
+app.get('/', initApp, (req, res) => {
+    // res.send('app启动');
+    res.redirect('/list');
 })
 app.listen(3000, (req, res) => {
     console.log('服务器运行成功')
