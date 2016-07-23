@@ -6,3 +6,11 @@
 form>div{
  padding-bottom: 0;
 }
+.main-content-inner{
+ 
+  padding-bottom: 45px;
+}
+.footer-content{
+ background-color: #F5F5F5;
+ width: 100%;
+}
